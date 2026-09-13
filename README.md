@@ -64,30 +64,74 @@ account or deployment credential is included in this repository.
 ReliabilityKit deliberately keeps the browser and CLI implementations separate
 while holding their results to one shared contract:
 
-```text
-Kubernetes YAML/JSON ─┬─> Python CLI auditor ──────> terminal/JSON report
-                      └─> browser auditor ─────────> dashboard/JSON download
+```mermaid
+flowchart TB
+    operator([SRE or platform engineer])
+    agent([AI agent / MCP host])
+    input[(Manifest files, SLO numbers,<br/>or incident facts)]
 
-SLO inputs ───────────┬─> Python calculator ───────> terminal/JSON report
-                      └─> browser calculator ──────> dashboard/JSON download
+    subgraph laptop[Customer laptop - local trust boundary]
+        direction TB
 
-Incident facts ───────┬─> Python generator ────────> Markdown file
-                      └─> browser generator ───────> Markdown download
+        subgraph entry[Entry points]
+            dashboard[Browser dashboard<br/>React + TypeScript]
+            cli[Command-line interface<br/>Python]
+            mcp[MCP server<br/>local stdio only]
+        end
 
-tests/golden/cases.json ─> Python tests + TypeScript tests
-AI agent ─> local MCP stdio server ─> bounded, structured tool calls
+        agentGuard[Agent security boundary<br/>schema validation, allowed roots,<br/>file and byte limits, redaction]
+        browserCore[Browser domain modules<br/>audit / SLO / postmortem]
+        pythonCore[Python domain modules<br/>audit / SLO / postmortem]
+        contract[Shared golden contract<br/>tests/golden/cases.json]
+        output[(Dashboard view, JSON,<br/>Markdown, or terminal output)]
+
+        dashboard --> browserCore
+        cli --> pythonCore
+        mcp --> agentGuard --> pythonCore
+        contract -. parity tests .-> browserCore
+        contract -. parity tests .-> pythonCore
+        browserCore --> output
+        pythonCore --> output
+    end
+
+    operator --> dashboard
+    operator --> cli
+    agent -->|launches child process| mcp
+    input -->|selected or entered locally| dashboard
+    input -->|local path or values| cli
+    input -->|structured request| mcp
+
+    subgraph excluded[Explicitly outside the product boundary]
+        cluster[(Kubernetes API / kubeconfig)]
+        shell[Shell execution or arbitrary network access]
+    end
 ```
 
 The dashboard is client-side: a manifest is parsed and evaluated in the user's
 browser. The Python CLI follows the same local-first model for terminals and CI.
 Neither workflow needs Kubernetes credentials or an application backend.
 
+How to read the diagram:
+
+- **Human path:** you use either the dashboard or CLI. Both process data on the
+  laptop and produce browser, terminal, JSON, or Markdown output.
+- **Agent path:** an MCP-compatible host launches `reliabilitykit-mcp` as a
+  child process. Requests cross the agent security boundary before reaching the
+  existing Python tools.
+- **Two implementations, one behavior:** the browser uses TypeScript and the
+  CLI/MCP server use Python. Shared golden test cases keep their results aligned.
+- **Trust boundary:** there is no Kubernetes API, kubeconfig, shell, or general
+  filesystem tool. Agent manifest reads are limited to operator-approved roots.
+
 ### Request flow
 
-1. A user chooses the manifest audit, SLO calculator, or postmortem builder.
-2. The selected implementation validates the local input.
-3. A domain module performs the calculation or analysis.
-4. The interface renders a result and optionally downloads JSON or Markdown.
+1. A human or agent chooses the manifest audit, SLO calculator, or postmortem
+   builder.
+2. The selected interface validates the structured input. Agent manifest paths
+   also pass canonical-path, allowed-root, file-count, and byte-size checks.
+3. A domain module performs the calculation or analysis without cluster access.
+4. The interface returns structured data and optionally renders or downloads
+   JSON or Markdown.
 5. Shared golden fixtures detect behavior drift between Python and TypeScript.
 
 ## Folder structure
