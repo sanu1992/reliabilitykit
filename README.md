@@ -64,48 +64,7 @@ account or deployment credential is included in this repository.
 ReliabilityKit deliberately keeps the browser and CLI implementations separate
 while holding their results to one shared contract:
 
-```mermaid
-flowchart TB
-    operator([SRE or platform engineer])
-    agent([AI agent / MCP host])
-    input[(Manifest files, SLO numbers,<br/>or incident facts)]
-
-    subgraph laptop[Customer laptop - local trust boundary]
-        direction TB
-
-        subgraph entry[Entry points]
-            dashboard[Browser dashboard<br/>React + TypeScript]
-            cli[Command-line interface<br/>Python]
-            mcp[MCP server<br/>local stdio only]
-        end
-
-        agentGuard[Agent security boundary<br/>schema validation, allowed roots,<br/>file and byte limits, redaction]
-        browserCore[Browser domain modules<br/>audit / SLO / postmortem]
-        pythonCore[Python domain modules<br/>audit / SLO / postmortem]
-        contract[Shared golden contract<br/>tests/golden/cases.json]
-        output[(Dashboard view, JSON,<br/>Markdown, or terminal output)]
-
-        dashboard --> browserCore
-        cli --> pythonCore
-        mcp --> agentGuard --> pythonCore
-        contract -. parity tests .-> browserCore
-        contract -. parity tests .-> pythonCore
-        browserCore --> output
-        pythonCore --> output
-    end
-
-    operator --> dashboard
-    operator --> cli
-    agent -->|launches child process| mcp
-    input -->|selected or entered locally| dashboard
-    input -->|local path or values| cli
-    input -->|structured request| mcp
-
-    subgraph excluded[Explicitly outside the product boundary]
-        cluster[(Kubernetes API / kubeconfig)]
-        shell[Shell execution or arbitrary network access]
-    end
-```
+[![ReliabilityKit architecture showing the dashboard, CLI, MCP security boundary, domain modules, shared contract tests, and local outputs](docs/architecture.png)](docs/architecture.svg)
 
 The dashboard is client-side: a manifest is parsed and evaluated in the user's
 browser. The Python CLI follows the same local-first model for terminals and CI.
