@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reliabilitykit"
-version = "0.1.0"
-description = "Offline Kubernetes reliability, SLO, and incident postmortem tools."
+version = "0.2.0"
+description = "Local-first Kubernetes reliability, SLO, postmortem, and MCP agent tools."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -23,8 +23,14 @@ dependencies = [
   "PyYAML>=6.0.2,<7",
 ]
 
+[project.optional-dependencies]
+agent = [
+  "mcp>=2.2,<3",
+]
+
 [project.scripts]
 reliabilitykit = "reliabilitykit.cli:main"
+reliabilitykit-mcp = "reliabilitykit.agent_server:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

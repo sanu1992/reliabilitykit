@@ -2,7 +2,7 @@
 
 ## Current trust boundary
 
-Version 0.1 is an offline manifest analysis tool. It:
+The ReliabilityKit CLI and dashboard remain offline, local-first tools. They:
 
 - Reads only the file or directory selected by the operator
 - Does not connect to Kubernetes
@@ -30,6 +30,31 @@ Workload specifications can contain plaintext environment values. The auditor
 checks only the fields needed by its rules and does not copy environment values
 into the report.
 
+## Agent trust boundary
+
+Version 0.2 includes an optional MCP server that uses local stdio transport. It
+does not listen on a network interface. Agent-requested manifest reads are
+restricted to `RELIABILITYKIT_ALLOWED_ROOTS`, or the server's current working
+directory when no roots are configured.
+
+Before an agent audit, ReliabilityKit resolves canonical paths, rejects reads
+outside the allowed roots, verifies resolved manifest files remain inside the
+boundary, and enforces a maximum of 100 files and 4 MiB. Resource-name
+redaction is enabled by default. The server exposes no shell, subprocess,
+Kubernetes, kubeconfig, log, Secret-value, or general-purpose file tool.
+
+The local operating-system user remains inside the trust boundary. A user who
+can modify an allowed directory or the running process can also change what the
+server reads. Use a dedicated, read-only manifest export directory when the
+source is not fully trusted.
+
+Expected validation and access failures are returned as sanitized tool errors.
+Unexpected failures are left to the MCP SDK's production error sanitization.
+
+Do not put an unauthenticated HTTP bridge in front of the stdio server. A
+multi-user service requires tenant isolation, authentication, authorization,
+rate limits, secure audit logging, and a separate threat model.
+
 ## Future live collector requirements
 
 A future live-cluster collector must:
@@ -52,4 +77,3 @@ Do not disclose a suspected vulnerability in a public issue. Once the GitHub
 repository is published, use its private vulnerability reporting feature. Until
 then, stop using the affected function and retain the minimum evidence needed
 to reproduce the issue safely.
-

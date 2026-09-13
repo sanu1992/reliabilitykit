@@ -1,8 +1,8 @@
 # ReliabilityKit
 
 ReliabilityKit is an early-stage, local-first toolkit for practical Kubernetes
-and SRE workflows. Version 0.1 provides one browser dashboard and three matching
-command-line tools:
+and SRE workflows. Version 0.2 provides one browser dashboard, three matching
+command-line tools, and a secure MCP interface for AI agents:
 
 1. **Kubernetes manifest auditor** - finds reliability risks in local YAML and
    JSON manifests without connecting to a cluster.
@@ -12,6 +12,23 @@ command-line tools:
 
 The tools ask for no cluster credentials. Dashboard inputs are processed in the
 browser and are not sent to an application backend.
+
+## Connect an AI agent
+
+Install the optional agent integration:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\python -m pip install -e ".[agent]"
+```
+
+Point an MCP-compatible host at the absolute path to
+`.venv\Scripts\reliabilitykit-mcp.exe`. The server runs over local stdio and
+opens no network port. Restrict manifest access with
+`RELIABILITYKIT_ALLOWED_ROOTS`; resource identifiers are redacted by default.
+
+See [the agent integration guide](docs/AGENT_INTEGRATION.md) for configuration,
+tool contracts, and the security boundary.
 
 > [!IMPORTANT]
 > ReliabilityKit provides engineering signals, not a security or compliance
@@ -58,6 +75,7 @@ Incident facts ───────┬─> Python generator ──────�
                       └─> browser generator ───────> Markdown download
 
 tests/golden/cases.json ─> Python tests + TypeScript tests
+AI agent ─> local MCP stdio server ─> bounded, structured tool calls
 ```
 
 The dashboard is client-side: a manifest is parsed and evaluated in the user's
@@ -77,6 +95,7 @@ Neither workflow needs Kubernetes credentials or an application backend.
 ```text
 reliabilitykit/
 ├── .github/workflows/ci.yml       # Python and dashboard CI
+├── AGENTS.md                       # Safety contract for coding agents
 ├── dashboard/                     # React/Vinext browser application
 │   ├── app/                       # Page, layout, and global visual tokens
 │   ├── components/dashboard/      # Three product workflows
@@ -84,7 +103,7 @@ reliabilitykit/
 │   ├── lib/                       # TypeScript audit/SLO/postmortem logic
 │   ├── public/                    # Brand and background assets
 │   └── tests/                     # Browser-logic golden contract tests
-├── docs/SECURITY_MODEL.md         # Data handling and trust boundaries
+├── docs/                           # Security and agent integration guidance
 ├── src/reliabilitykit/            # Python package and CLI domain modules
 ├── tests/                         # Python tests, fixtures, shared contract
 ├── CHANGELOG.md                   # Version history
@@ -99,7 +118,7 @@ Python 3.10 or newer is required.
 ### Windows PowerShell
 
 ```powershell
-py -m venv .venv
+python -m venv .venv
 .venv\Scripts\python -m pip install --upgrade pip
 .venv\Scripts\python -m pip install -e .
 .venv\Scripts\reliabilitykit --help

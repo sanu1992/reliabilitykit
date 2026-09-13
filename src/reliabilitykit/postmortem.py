@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from html import escape
 from pathlib import Path
 
 
@@ -57,8 +58,29 @@ def generate_postmortem(data: PostmortemInput) -> str:
     duration = format_elapsed(data.started_at, data.ended_at)
     started = data.started_at.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
     ended = data.ended_at.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    title = escape(data.title, quote=False).replace("\r", " ").replace("\n", " ")
+    incident_id = (
+        escape(data.incident_id, quote=False)
+        .replace("\r", " ")
+        .replace("\n", " ")
+        .replace("|", "\\|")
+    )
+    severity = (
+        escape(data.severity, quote=False)
+        .replace("\r", " ")
+        .replace("\n", " ")
+        .replace("|", "\\|")
+    )
+    service = (
+        escape(data.service, quote=False)
+        .replace("\r", " ")
+        .replace("\n", " ")
+        .replace("|", "\\|")
+    )
+    summary = escape(data.summary, quote=False)
+    impact = escape(data.impact, quote=False)
 
-    return f"""# {data.title}
+    return f"""# {title}
 
 > This document is blameless. It focuses on system conditions, safeguards, and learning rather than individual fault.
 
@@ -66,9 +88,9 @@ def generate_postmortem(data: PostmortemInput) -> str:
 
 | Field | Value |
 |---|---|
-| Incident ID | {data.incident_id} |
-| Severity | {data.severity} |
-| Service | {data.service} |
+| Incident ID | {incident_id} |
+| Severity | {severity} |
+| Service | {service} |
 | Status | Draft |
 | Started (UTC) | {started} |
 | Ended (UTC) | {ended} |
@@ -76,11 +98,11 @@ def generate_postmortem(data: PostmortemInput) -> str:
 
 ## Executive summary
 
-{data.summary}
+{summary}
 
 ## Customer and business impact
 
-{data.impact}
+{impact}
 
 ## Detection
 
@@ -160,4 +182,3 @@ def write_postmortem(data: PostmortemInput, output: Path) -> Path:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(generate_postmortem(data), encoding="utf-8")
     return output
-
