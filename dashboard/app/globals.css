@@ -1,0 +1,207 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+body {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+:root,
+.dark {
+  --background: oklch(0.975 0.009 250);
+  --foreground: oklch(0.2 0.035 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.035 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.035 260);
+  --primary: oklch(0.55 0.23 270);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.025 250);
+  --secondary-foreground: oklch(0.29 0.07 263);
+  --muted: oklch(0.95 0.015 250);
+  --muted-foreground: oklch(0.52 0.035 255);
+  --accent: oklch(0.94 0.045 225);
+  --accent-foreground: oklch(0.3 0.12 250);
+  --destructive: oklch(0.61 0.23 25);
+  --border: oklch(0.87 0.022 250);
+  --input: oklch(0.84 0.028 250);
+  --ring: oklch(0.67 0.19 225);
+  --chart-1: oklch(0.55 0.23 270);
+  --chart-2: oklch(0.7 0.16 220);
+  --chart-3: oklch(0.62 0.23 300);
+  --chart-4: oklch(0.78 0.17 125);
+  --chart-5: oklch(0.72 0.17 65);
+  --radius: 0.9rem;
+  --sidebar: oklch(0.985 0.007 250);
+  --sidebar-foreground: oklch(0.2 0.035 260);
+  --sidebar-primary: oklch(0.55 0.23 270);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.95 0.025 250);
+  --sidebar-accent-foreground: oklch(0.29 0.07 263);
+  --sidebar-border: oklch(0.87 0.022 250);
+  --sidebar-ring: oklch(0.67 0.19 225);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at 9% 5%, rgb(99 102 241 / 9%), transparent 29rem),
+      radial-gradient(
+        circle at 91% 24%,
+        rgb(6 182 212 / 9%),
+        transparent 32rem
+      ),
+      linear-gradient(180deg, #f9fbff 0%, #f3f6fb 58%, #eef3f9 100%);
+    background-attachment: fixed;
+  }
+}
+
+::selection {
+  background: rgb(99 102 241 / 20%);
+  color: #172554;
+}
+
+.rk-image-background {
+  position: absolute;
+  inset: 4.5rem 0 auto;
+  height: 58rem;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgb(248 250 252 / 8%) 0%,
+      rgb(248 250 252 / 20%) 58%,
+      rgb(243 246 251 / 96%) 100%
+    ),
+    url('/reliability-background.png');
+  background-position: center top;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.78;
+  mask-image: linear-gradient(to bottom, black 0%, black 76%, transparent 100%);
+}
+
+.rk-aurora {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(37 99 235 / 4.5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(37 99 235 / 4.5%) 1px, transparent 1px),
+    radial-gradient(circle at 18% 2%, rgb(139 92 246 / 9%), transparent 27rem),
+    radial-gradient(circle at 94% 31%, rgb(34 211 238 / 11%), transparent 31rem);
+  background-size:
+    64px 64px,
+    64px 64px,
+    auto,
+    auto;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+.rk-tool-tabs {
+  height: auto !important;
+  min-height: min-content;
+  align-items: stretch;
+}
+
+.rk-tool-tab {
+  height: auto !important;
+  min-height: 4.75rem;
+}
+
+.rk-tool-surface [data-slot='card'] {
+  border-color: rgb(148 163 184 / 30%) !important;
+  border-radius: 1.25rem;
+  background: rgb(255 255 255 / 88%) !important;
+  box-shadow:
+    0 28px 75px rgb(51 65 85 / 10%),
+    inset 0 1px rgb(255 255 255 / 80%) !important;
+  backdrop-filter: blur(16px);
+}
+
+.rk-tool-surface [data-slot='card-header'] {
+  border-color: rgb(148 163 184 / 24%) !important;
+}
+
+.rk-tool-surface [data-slot='input'],
+.rk-tool-surface [data-slot='textarea'],
+.rk-tool-surface [data-slot='select-trigger'] {
+  border-color: rgb(148 163 184 / 42%) !important;
+  background: rgb(248 250 252 / 88%) !important;
+  color: #172033 !important;
+}
+
+.rk-tool-surface [data-slot='input']:focus-visible,
+.rk-tool-surface [data-slot='textarea']:focus-visible,
+.rk-tool-surface [data-slot='select-trigger']:focus-visible {
+  border-color: rgb(79 70 229 / 55%) !important;
+}
+
+@media (max-width: 639px) {
+  .rk-image-background {
+    height: 74rem;
+    background-position: 46% top;
+    background-size: auto 74rem;
+    opacity: 0.62;
+  }
+
+  .rk-tool-tab {
+    min-height: 4.25rem;
+  }
+}

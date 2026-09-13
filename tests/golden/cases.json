@@ -1,0 +1,98 @@
+{
+  "contract_version": 1,
+  "audit_cases": [
+    {
+      "name": "risky deployment",
+      "input_path": "tests/fixtures/risky.yaml",
+      "redact_names": false,
+      "expected": {
+        "resources_scanned": 1,
+        "sensitive_resources_skipped": 1,
+        "score": 45,
+        "grade": "F",
+        "finding_counts": {
+          "critical": 0,
+          "high": 3,
+          "medium": 5,
+          "low": 0,
+          "info": 0
+        },
+        "check_ids": [
+          "RK-K8S-002",
+          "RK-K8S-005",
+          "RK-K8S-009",
+          "RK-K8S-010",
+          "RK-K8S-011",
+          "RK-K8S-012",
+          "RK-K8S-013",
+          "RK-K8S-014"
+        ]
+      }
+    }
+  ],
+  "slo_cases": [
+    {
+      "name": "three nines with half the event budget consumed",
+      "input": {
+        "objective_percent": 99.9,
+        "window_days": 30,
+        "total_events": 1000000,
+        "bad_events": 500
+      },
+      "expected": {
+        "allowed_downtime_seconds": 2592,
+        "allowed_downtime_human": "43m 12s",
+        "allowed_bad_events": 1000,
+        "remaining_bad_events": 500,
+        "budget_consumed_percent": 50,
+        "observed_availability_percent": 99.95,
+        "compliant": true
+      }
+    },
+    {
+      "name": "perfect objective exceeded by one bad event",
+      "input": {
+        "objective_percent": 100,
+        "window_days": 30,
+        "total_events": 1000,
+        "bad_events": 1
+      },
+      "expected": {
+        "allowed_downtime_seconds": 0,
+        "allowed_downtime_human": "0s",
+        "allowed_bad_events": 0,
+        "remaining_bad_events": -1,
+        "budget_consumed_percent": null,
+        "observed_availability_percent": 99.9,
+        "compliant": false
+      }
+    }
+  ],
+  "postmortem_cases": [
+    {
+      "name": "timezone normalization and duration",
+      "input": {
+        "title": "Checkout latency incident",
+        "incident_id": "INC-2026-001",
+        "severity": "SEV-2",
+        "service": "checkout-api",
+        "started_at": "2026-09-13T10:00:00+05:30",
+        "ended_at": "2026-09-13T11:30:00+05:30",
+        "summary": "Checkout requests experienced elevated latency.",
+        "impact": "Ten percent of checkout requests exceeded the latency SLO."
+      },
+      "expected": {
+        "duration": "1h 30m",
+        "started_utc": "2026-09-13T04:30:00Z",
+        "ended_utc": "2026-09-13T06:00:00Z",
+        "required_sections": [
+          "## Detection",
+          "## Timeline",
+          "## Five whys",
+          "## Corrective actions",
+          "## SLO and error-budget impact"
+        ]
+      }
+    }
+  ]
+}
